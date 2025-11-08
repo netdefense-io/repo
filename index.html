@@ -166,11 +166,16 @@
             margin-bottom: 50px;
             border: 1px solid rgba(96, 165, 250, 0.3);
             backdrop-filter: blur(10px);
+            max-width: 850px;
         }
 
         .hero h2 {
             color: #60a5fa;
             margin-bottom: 20px;
+        }
+
+        .install-wrapper {
+            margin: 25px 0;
         }
 
         .install-command {
@@ -180,13 +185,15 @@
             border-radius: 12px;
             font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
             font-size: 1em;
-            margin: 25px 0;
             overflow-x: auto;
             border: 1px solid rgba(148, 163, 184, 0.2);
             border-left: 4px solid #60a5fa;
             position: relative;
             cursor: pointer;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .install-command:hover {
@@ -199,6 +206,38 @@
             color: #94a3b8;
             user-select: none;
             font-weight: bold;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+            margin-left: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 40px;
+            width: 40px;
+        }
+
+        .copy-btn:hover {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        .copy-btn.copied {
+            background: linear-gradient(135deg, #10b981, #059669);
         }
 
         code {
@@ -525,7 +564,14 @@
             <section id="install" class="hero">
                 <h2><i class="fas fa-zap"></i> Quick Installation</h2>
                 <p>Install the NetDefense agent on your OPNsense device with a single command:</p>
-                <div class="install-command">curl -sSL https://repo.netdefense.io/install.sh | sh</div>
+                <div class="install-wrapper">
+                    <div class="install-command" id="installCmd" onclick="copyToClipboard(event)" title="Click to copy to clipboard">
+                        curl -sSL https://repo.netdefense.io/install.sh | sh
+                        <button class="copy-btn" title="Copy to clipboard">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
                 <div class="alert alert-info">
                     <div class="alert-icon"><i class="fas fa-lock"></i></div>
                     <div>
@@ -696,5 +742,35 @@ fingerprint: "97deed32012431768be5ccd10b34e145450e97890593c7b522eafe4fe9fdb99d"<
             </div>
         </footer>
     </div>
+    <script>
+        function copyToClipboard(event) {
+            // Don't copy if user clicked the button itself
+            if (event && event.target.closest('.copy-btn')) {
+                return;
+            }
+
+            const installCmd = document.getElementById('installCmd');
+            // Extract only the text, excluding the button
+            const text = Array.from(installCmd.childNodes)
+                .filter(node => node.nodeType === Node.TEXT_NODE)
+                .map(node => node.textContent.trim())
+                .join('');
+
+            const copyBtn = document.querySelector('.copy-btn');
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalIcon = copyBtn.innerHTML;
+                copyBtn.classList.add('copied');
+                copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+
+                setTimeout(() => {
+                    copyBtn.classList.remove('copied');
+                    copyBtn.innerHTML = originalIcon;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+    </script>
 </body>
 </html>
