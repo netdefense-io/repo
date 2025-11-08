@@ -154,19 +154,15 @@ verify_installation() {
 
 # Display post-installation information
 post_install_info() {
-    cat <<EOF
+    cat <<'EOF'
 
-${GREEN}========================================${NC}
-${GREEN}NetDefense Agent Installation Complete${NC}
-${GREEN}========================================${NC}
+========================================
+NetDefense Agent Installation Complete
+========================================
 
-Next steps:
-  1. Configure the agent by editing: /usr/local/etc/netdefense/agent.conf
-  2. Start the service: service netdefense start
-  3. Enable on boot: sysrc netdefense_enable=YES
-  4. Check status: service netdefense status
-
-For more information, visit: https://docs.netdefense.io
+Configuration:
+  Navigate to Services > NetDefense in the OPNsense web interface
+  to configure and manage the NetDefense agent.
 
 EOF
 }
