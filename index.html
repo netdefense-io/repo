@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetDefense Package Repository</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        section {
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #34495e;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .quick-install {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .quick-install h2 {
+            color: white;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .install-command {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 5px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.1em;
+            margin: 20px 0;
+            word-wrap: break-word;
+            border-left: 4px solid #f39c12;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+            color: #e74c3c;
+            font-size: 0.95em;
+        }
+
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: #ecf0f1;
+            font-size: 0.9em;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .warning strong {
+            color: #e67e22;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .info strong {
+            color: #2980b9;
+        }
+
+        .package-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+
+        .package-info ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .package-info li {
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .package-info li:last-child {
+            border-bottom: none;
+        }
+
+        .package-info strong {
+            color: #495057;
+            display: inline-block;
+            min-width: 150px;
+        }
+
+        ol, ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+        }
+
+        footer a {
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        footer a:hover {
+            color: #5dade2;
+        }
+
+        .github-link {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin: 10px 5px;
+            transition: background 0.3s;
+        }
+
+        .github-link:hover {
+            background: #2980b9;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            .install-command {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>NetDefense Package Repository</h1>
+            <p>Official OPNsense package repository for NetDefense device management agent</p>
+        </header>
+
+        <div class="content">
+            <section class="quick-install">
+                <h2>Quick Install</h2>
+                <p>Install the NetDefense agent on your OPNsense device with a single command:</p>
+                <div class="install-command">
+                    curl -sSL https://repo.netdefense.io/install.sh | sh
+                </div>
+                <div class="warning">
+                    <strong>Important:</strong> This installation requires root privileges. Only run installation scripts from trusted sources. This is designed specifically for OPNsense firewall devices running on FreeBSD 14.
+                </div>
+            </section>
+
+            <section>
+                <h2>Manual Installation</h2>
+                <p>If you prefer to configure the repository manually, follow these steps:</p>
+
+                <h3>1. Create Repository Configuration</h3>
+                <p>Create the NetDefense repository configuration file:</p>
+                <pre><code>mkdir -p /usr/local/etc/pkg/repos
+cat &lt;&lt; EOF &gt; /usr/local/etc/pkg/repos/netdefense.conf
+NetDefense: {
+    url: "https://repo.netdefense.io/opnsense",
+    mirror_type: "https",
+    enabled: yes,
+    signature_type: "none"
+}
+EOF</code></pre>
+
+                <h3>2. Update Package Database</h3>
+                <p>Refresh the package repository database:</p>
+                <pre><code>pkg update</code></pre>
+
+                <h3>3. Install NetDefense Agent</h3>
+                <p>Install the NetDefense package:</p>
+                <pre><code>pkg install os-netdefense</code></pre>
+
+                <h3>4. Verify Installation</h3>
+                <p>Confirm the package is installed correctly:</p>
+                <pre><code>pkg info os-netdefense</code></pre>
+            </section>
+
+            <section>
+                <h2>Package Information</h2>
+                <div class="package-info">
+                    <ul>
+                        <li><strong>Package Name:</strong> os-netdefense</li>
+                        <li><strong>Current Version:</strong> 0.0.1</li>
+                        <li><strong>Package Size:</strong> ~31 MB</li>
+                        <li><strong>Supported Platform:</strong> OPNsense 25.7 / FreeBSD 14 amd64</li>
+                        <li><strong>Description:</strong> NetDefense device management agent for centralized firewall management</li>
+                    </ul>
+                </div>
+
+                <h3>What is NetDefense?</h3>
+                <p>NetDefense is a comprehensive firewall management system that enables administrators to centrally manage and monitor network security devices at scale. The agent package allows your OPNsense firewall to communicate with the NetDefense management platform for:</p>
+                <ul>
+                    <li>Centralized configuration management</li>
+                    <li>Remote task execution</li>
+                    <li>Real-time monitoring and telemetry</li>
+                    <li>Template-based configuration deployment</li>
+                    <li>Audit logging and compliance tracking</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Important Notes</h2>
+                <div class="warning">
+                    <strong>Security Warning:</strong> Adding third-party package repositories to your firewall requires careful consideration. Only add repositories from trusted sources. The NetDefense repository currently uses unsigned packages for development purposes. Production deployments should implement proper package signing.
+                </div>
+
+                <div class="info">
+                    <strong>System Requirements:</strong>
+                    <ul>
+                        <li>OPNsense 25.7 or compatible version</li>
+                        <li>FreeBSD 14 (amd64 architecture)</li>
+                        <li>Network connectivity to repo.netdefense.io</li>
+                        <li>Root/administrative access for installation</li>
+                    </ul>
+                </div>
+
+                <h3>Uninstallation</h3>
+                <p>To remove the NetDefense agent:</p>
+                <pre><code>pkg delete os-netdefense</code></pre>
+
+                <h3>Repository Maintenance</h3>
+                <p>To disable the repository without uninstalling the package:</p>
+                <pre><code>rm /usr/local/etc/pkg/repos/netdefense.conf
+pkg update</code></pre>
+            </section>
+
+            <section>
+                <h2>Support & Documentation</h2>
+                <p>For more information, documentation, and support:</p>
+                <a href="https://github.com/netdefense" class="github-link">GitHub Repository</a>
+                <a href="https://github.com/netdefense/repo/issues" class="github-link">Report an Issue</a>
+
+                <h3>Getting Help</h3>
+                <ul>
+                    <li>Check the official documentation for configuration guides</li>
+                    <li>Review existing GitHub issues for known problems</li>
+                    <li>Submit detailed bug reports with system information</li>
+                    <li>Join the community discussions for best practices</li>
+                </ul>
+            </section>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 NetDefense Project. All rights reserved.</p>
+            <p>This is an open-source project. Contributions are welcome!</p>
+            <p style="margin-top: 10px;">
+                <a href="https://github.com/netdefense">GitHub</a> |
+                <a href="https://github.com/netdefense/repo/issues">Issues</a> |
+                <a href="https://github.com/netdefense/repo">Repository</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
