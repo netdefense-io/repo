@@ -12,276 +12,308 @@
         }
 
         body {
-            font-family: 'Courier New', 'Courier', 'Monaco', monospace;
-            line-height: 1.6;
-            color: #c0c0c0;
-            background: #0a0a0a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            line-height: 1.7;
+            color: #1a202c;
+            background: #f7fafc;
             min-height: 100vh;
-            padding: 20px;
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
-            background: #1a1a1a;
-            border: 1px solid #333;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+            background: white;
         }
 
         header {
-            background: #0d0d0d;
-            color: #00ff00;
-            padding: 30px;
-            border-bottom: 2px solid #00ff00;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
         }
 
-        .ascii-art {
-            font-family: 'Courier New', monospace;
-            font-size: 0.7em;
-            line-height: 1.2;
-            color: #00ff00;
-            margin-bottom: 20px;
-            white-space: pre;
-            overflow-x: auto;
-        }
-
-        header h1 {
-            font-size: 1.8em;
-            margin-bottom: 5px;
+        .logo {
+            font-size: 2.5em;
             font-weight: 700;
-            color: #00ff00;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
         }
 
-        header p {
-            font-size: 1em;
-            color: #808080;
+        .tagline {
+            font-size: 1.2em;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        nav {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+            padding: 20px 0;
+        }
+
+        nav a {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: #3b82f6;
         }
 
         .content {
-            padding: 40px;
+            padding: 60px 40px;
         }
 
         section {
-            margin-bottom: 40px;
-            border-left: 2px solid #333;
-            padding-left: 20px;
+            margin-bottom: 60px;
+            max-width: 900px;
         }
 
         h2 {
-            color: #00ff00;
-            font-size: 1.5em;
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        h2::before {
-            content: ">> ";
-            color: #00ff00;
+            color: #1a202c;
+            font-size: 2em;
+            margin-bottom: 20px;
+            font-weight: 700;
         }
 
         h3 {
-            color: #00cc00;
-            font-size: 1.2em;
-            margin-top: 20px;
-            margin-bottom: 10px;
-        }
-
-        h3::before {
-            content: "$ ";
-            color: #808080;
+            color: #2d3748;
+            font-size: 1.4em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
         }
 
         p {
+            margin-bottom: 16px;
+            color: #4a5568;
+            font-size: 1.05em;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 40px;
+            border: 1px solid #bfdbfe;
+        }
+
+        .hero h2 {
+            color: #1e3a8a;
             margin-bottom: 15px;
-            color: #c0c0c0;
-        }
-
-        .quick-install {
-            background: #0d0d0d;
-            border: 2px solid #00ff00;
-            padding: 30px;
-            margin: 20px 0;
-        }
-
-        .quick-install h2 {
-            color: #00ff00;
         }
 
         .install-command {
-            background: #000000;
-            padding: 20px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 1.1em;
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 24px;
+            border-radius: 8px;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            font-size: 1em;
             margin: 20px 0;
-            word-wrap: break-word;
-            border: 1px solid #00ff00;
-            color: #00ff00;
+            overflow-x: auto;
+            border-left: 4px solid #3b82f6;
+            position: relative;
+        }
+
+        .install-command::before {
+            content: '$ ';
+            color: #94a3b8;
+            user-select: none;
         }
 
         code {
-            background: #0d0d0d;
+            background: #f1f5f9;
             padding: 3px 8px;
-            font-family: 'Courier New', Courier, monospace;
-            color: #00cc00;
-            font-size: 0.95em;
-            border: 1px solid #333;
+            border-radius: 4px;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            color: #e11d48;
+            font-size: 0.9em;
         }
 
         pre {
-            background: #000000;
-            color: #00ff00;
-            padding: 20px;
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 24px;
+            border-radius: 8px;
             overflow-x: auto;
-            margin: 15px 0;
-            border: 1px solid #333;
+            margin: 20px 0;
+            border: 1px solid #334155;
         }
 
         pre code {
             background: none;
             padding: 0;
-            color: #00ff00;
-            font-size: 0.9em;
-            border: none;
+            color: #e2e8f0;
+            font-size: 0.95em;
         }
 
-        .warning {
-            background: #1a0f00;
-            border: 1px solid #ff9900;
-            border-left: 4px solid #ff9900;
-            padding: 15px;
-            margin: 15px 0;
+        .alert {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: flex;
+            gap: 12px;
+            align-items: start;
         }
 
-        .warning strong {
-            color: #ff9900;
+        .alert-warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            color: #92400e;
         }
 
-        .warning::before {
-            content: "[!] ";
-            color: #ff9900;
+        .alert-info {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            color: #1e3a8a;
+        }
+
+        .alert-icon {
             font-weight: bold;
+            font-size: 1.2em;
+            flex-shrink: 0;
         }
 
-        .info {
-            background: #001a1a;
-            border: 1px solid #0099cc;
-            border-left: 4px solid #0099cc;
-            padding: 15px;
-            margin: 15px 0;
+        .package-grid {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 20px 0;
         }
 
-        .info strong {
-            color: #00ccff;
+        .package-grid dl {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 16px;
+            margin: 0;
         }
 
-        .info::before {
-            content: "[i] ";
-            color: #0099cc;
-            font-weight: bold;
+        .package-grid dt {
+            font-weight: 600;
+            color: #2d3748;
         }
 
-        .package-info {
-            background: #0d0d0d;
-            border: 1px solid #333;
-            padding: 20px;
-            margin: 15px 0;
+        .package-grid dd {
+            margin: 0;
+            color: #4a5568;
         }
 
-        .package-info ul {
-            list-style: none;
-            margin-left: 0;
-        }
-
-        .package-info li {
-            padding: 8px 0;
-            border-bottom: 1px solid #262626;
-            color: #c0c0c0;
-        }
-
-        .package-info li::before {
-            content: "• ";
-            color: #00ff00;
-        }
-
-        .package-info li:last-child {
-            border-bottom: none;
-        }
-
-        .package-info strong {
-            color: #00ff00;
-            display: inline-block;
-            min-width: 150px;
-        }
-
-        ol, ul {
-            margin-left: 20px;
-            margin-bottom: 15px;
+        ul, ol {
+            margin: 16px 0 16px 24px;
         }
 
         li {
             margin-bottom: 10px;
-            color: #c0c0c0;
+            color: #4a5568;
+            padding-left: 8px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #3b82f6;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            margin: 10px 10px 10px 0;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-outline {
+            background: white;
+            color: #3b82f6;
+            border: 2px solid #3b82f6;
+        }
+
+        .btn-outline:hover {
+            background: #eff6ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
         }
 
         footer {
-            background: #0d0d0d;
-            color: #808080;
-            padding: 30px 40px;
+            background: #1e293b;
+            color: #cbd5e1;
+            padding: 40px;
             text-align: center;
-            border-top: 2px solid #00ff00;
+            border-top: 1px solid #334155;
         }
 
         footer a {
-            color: #00cc00;
+            color: #60a5fa;
             text-decoration: none;
-            transition: color 0.3s;
+            transition: color 0.2s;
         }
 
         footer a:hover {
-            color: #00ff00;
+            color: #93c5fd;
         }
 
-        .github-link {
-            display: inline-block;
-            background: #0d0d0d;
-            color: #00ff00;
-            padding: 10px 20px;
-            border: 1px solid #00ff00;
-            text-decoration: none;
-            margin: 10px 5px;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .github-link:hover {
-            background: #00ff00;
-            color: #000000;
+        .footer-links {
+            margin: 20px 0;
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
         @media (max-width: 768px) {
-            .ascii-art {
-                font-size: 0.5em;
+            header {
+                padding: 40px 20px;
             }
 
-            header h1 {
-                font-size: 1.5em;
+            .logo {
+                font-size: 2em;
             }
 
             .content {
-                padding: 20px;
+                padding: 40px 20px;
             }
 
-            h2 {
-                font-size: 1.3em;
+            nav {
+                padding: 0 20px;
             }
 
-            .install-command {
-                font-size: 0.9em;
+            nav ul {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .package-grid dl {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .package-grid dt {
+                margin-top: 16px;
+            }
+
+            .package-grid dt:first-of-type {
+                margin-top: 0;
             }
         }
     </style>
@@ -289,29 +321,28 @@
 <body>
     <div class="container">
         <header>
-            <div class="ascii-art">
- _   _      _   ____        __
-| \ | | ___| |_|  _ \  ___ / _| ___ _ __  ___  ___
-|  \| |/ _ \ __| | | |/ _ \ |_ / _ \ '_ \/ __|/ _ \
-| |\  |  __/ |_| |_| |  __/  _|  __/ | | \__ \  __/
-|_| \_|\___|\__|____/ \___|_|  \___|_| |_|___/\___|
-
-┌─────────────────────────────────────────────────┐
-│ FreeBSD Package Repository for OPNsense Agents │
-└─────────────────────────────────────────────────┘</div>
-            <h1>NetDefense Package Repository</h1>
-            <p>Official OPNsense package repository for NetDefense device management agent</p>
+            <div class="logo">NetDefense</div>
+            <div class="tagline">Package Repository for OPNsense</div>
         </header>
 
+        <nav>
+            <ul>
+                <li><a href="#install">Installation</a></li>
+                <li><a href="#packages">Packages</a></li>
+                <li><a href="#support">Support</a></li>
+            </ul>
+        </nav>
+
         <div class="content">
-            <section class="quick-install">
-                <h2>Quick Install</h2>
+            <section id="install" class="hero">
+                <h2>Quick Installation</h2>
                 <p>Install the NetDefense agent on your OPNsense device with a single command:</p>
-                <div class="install-command">
-                    curl -sSL https://repo.netdefense.io/install.sh | sh
-                </div>
-                <div class="warning">
-                    <strong>Important:</strong> This installation requires root privileges. Only run installation scripts from trusted sources. This is designed specifically for OPNsense firewall devices running on FreeBSD 14.
+                <div class="install-command">curl -sSL https://repo.netdefense.io/install.sh | sh</div>
+                <div class="alert alert-warning">
+                    <span class="alert-icon">⚠</span>
+                    <div>
+                        <strong>Important:</strong> This installation requires root privileges. Only run installation scripts from trusted sources. Designed for OPNsense firewall devices running on FreeBSD 14.
+                    </div>
                 </div>
             </section>
 
@@ -344,16 +375,25 @@ EOF</code></pre>
                 <pre><code>pkg info os-netdefense</code></pre>
             </section>
 
-            <section>
+            <section id="packages">
                 <h2>Package Information</h2>
-                <div class="package-info">
-                    <ul>
-                        <li><strong>Package Name:</strong> os-netdefense</li>
-                        <li><strong>Current Version:</strong> 0.0.1</li>
-                        <li><strong>Package Size:</strong> ~31 MB</li>
-                        <li><strong>Supported Platform:</strong> OPNsense 25.7 / FreeBSD 14 amd64</li>
-                        <li><strong>Description:</strong> NetDefense device management agent for centralized firewall management</li>
-                    </ul>
+                <div class="package-grid">
+                    <dl>
+                        <dt>Package Name</dt>
+                        <dd>os-netdefense</dd>
+
+                        <dt>Current Version</dt>
+                        <dd>0.0.1</dd>
+
+                        <dt>Package Size</dt>
+                        <dd>~31 MB</dd>
+
+                        <dt>Supported Platform</dt>
+                        <dd>OPNsense 25.7 / FreeBSD 14 amd64</dd>
+
+                        <dt>Description</dt>
+                        <dd>NetDefense device management agent for centralized firewall management</dd>
+                    </dl>
                 </div>
 
                 <h3>What is NetDefense?</h3>
@@ -369,18 +409,24 @@ EOF</code></pre>
 
             <section>
                 <h2>Important Notes</h2>
-                <div class="warning">
-                    <strong>Security Warning:</strong> Adding third-party package repositories to your firewall requires careful consideration. Only add repositories from trusted sources. The NetDefense repository currently uses unsigned packages for development purposes. Production deployments should implement proper package signing.
+                <div class="alert alert-warning">
+                    <span class="alert-icon">⚠</span>
+                    <div>
+                        <strong>Security Warning:</strong> Adding third-party package repositories to your firewall requires careful consideration. Only add repositories from trusted sources. The NetDefense repository currently uses unsigned packages for development purposes. Production deployments should implement proper package signing.
+                    </div>
                 </div>
 
-                <div class="info">
-                    <strong>System Requirements:</strong>
-                    <ul>
-                        <li>OPNsense 25.7 or compatible version</li>
-                        <li>FreeBSD 14 (amd64 architecture)</li>
-                        <li>Network connectivity to repo.netdefense.io</li>
-                        <li>Root/administrative access for installation</li>
-                    </ul>
+                <div class="alert alert-info">
+                    <span class="alert-icon">ℹ</span>
+                    <div>
+                        <strong>System Requirements:</strong>
+                        <ul style="margin: 8px 0 0 0;">
+                            <li>OPNsense 25.7 or compatible version</li>
+                            <li>FreeBSD 14 (amd64 architecture)</li>
+                            <li>Network connectivity to repo.netdefense.io</li>
+                            <li>Root/administrative access for installation</li>
+                        </ul>
+                    </div>
                 </div>
 
                 <h3>Uninstallation</h3>
@@ -393,11 +439,11 @@ EOF</code></pre>
 pkg update</code></pre>
             </section>
 
-            <section>
+            <section id="support">
                 <h2>Support & Documentation</h2>
                 <p>For more information, documentation, and support:</p>
-                <a href="https://github.com/netdefense-io" class="github-link">GitHub Repository</a>
-                <a href="https://github.com/netdefense-io/repo/issues" class="github-link">Report an Issue</a>
+                <a href="https://github.com/netdefense-io" class="btn">GitHub Organization</a>
+                <a href="https://github.com/netdefense-io/repo/issues" class="btn btn-outline">Report an Issue</a>
 
                 <h3>Getting Help</h3>
                 <ul>
@@ -410,13 +456,13 @@ pkg update</code></pre>
         </div>
 
         <footer>
-            <p>&copy; 2025 NetDefense Project. All rights reserved.</p>
-            <p>This is an open-source project. Contributions are welcome!</p>
-            <p style="margin-top: 10px;">
-                <a href="https://github.com/netdefense-io">GitHub</a> |
-                <a href="https://github.com/netdefense-io/repo/issues">Issues</a> |
+            <p>&copy; 2025 NetDefense Project</p>
+            <p style="margin-top: 8px; opacity: 0.8;">Open source firewall management platform</p>
+            <div class="footer-links">
+                <a href="https://github.com/netdefense-io">GitHub</a>
+                <a href="https://github.com/netdefense-io/repo/issues">Issues</a>
                 <a href="https://github.com/netdefense-io/repo">Repository</a>
-            </p>
+            </div>
         </footer>
     </div>
 </body>
