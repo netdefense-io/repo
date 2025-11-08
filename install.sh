@@ -27,6 +27,8 @@ REPO_CONF_DIR="/usr/local/etc/pkg/repos"
 REPO_CONF_FILE="${REPO_CONF_DIR}/${REPO_NAME}.conf"
 REPO_URL="https://repo.netdefense.io/opnsense"
 PACKAGE_NAME="os-netdefense"
+FINGERPRINT_DIR="/usr/local/etc/pkg/fingerprints/${REPO_NAME}/trusted"
+FINGERPRINT_URL="https://repo.netdefense.io/opnsense/fingerprints/netdefense/trusted/netdefense"
 
 # Logging functions
 log_info() {
@@ -81,6 +83,25 @@ create_repo_dir() {
     fi
 }
 
+# Install repository fingerprint for package verification
+install_fingerprint() {
+    log_info "Installing repository fingerprint for signature verification..."
+
+    # Create fingerprint directory
+    if [ ! -d "${FINGERPRINT_DIR}" ]; then
+        log_info "Creating ${FINGERPRINT_DIR}..."
+        mkdir -p "${FINGERPRINT_DIR}" || error_exit "Failed to create fingerprint directory" 2
+    fi
+
+    # Download fingerprint
+    log_info "Downloading fingerprint from ${FINGERPRINT_URL}..."
+    if fetch -o "${FINGERPRINT_DIR}/netdefense" "${FINGERPRINT_URL}"; then
+        log_success "Fingerprint installed successfully"
+    else
+        error_exit "Failed to download repository fingerprint" 3
+    fi
+}
+
 # Configure NetDefense repository
 configure_repo() {
     log_info "Configuring NetDefense package repository..."
@@ -93,17 +114,19 @@ configure_repo() {
         cp "${REPO_CONF_FILE}" "${BACKUP_FILE}" || error_exit "Failed to backup existing configuration" 3
     fi
 
-    # Write repository configuration
+    # Write repository configuration with signature verification
     log_info "Writing repository configuration to ${REPO_CONF_FILE}..."
     cat > "${REPO_CONF_FILE}" <<EOF || error_exit "Failed to write repository configuration" 4
 ${REPO_NAME}: {
   url: "${REPO_URL}",
   priority: 5,
-  enabled: yes
+  enabled: yes,
+  signature_type: "fingerprints",
+  fingerprints: "/usr/local/etc/pkg/fingerprints/${REPO_NAME}"
 }
 EOF
 
-    log_success "Repository configuration created"
+    log_success "Repository configuration created with signature verification"
 }
 
 # Update package repository
@@ -176,6 +199,7 @@ main() {
     check_os
     check_root
     create_repo_dir
+    install_fingerprint
     configure_repo
     update_pkg_repo
     install_package

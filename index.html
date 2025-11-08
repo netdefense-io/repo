@@ -338,6 +338,12 @@
                 <h2>Quick Installation</h2>
                 <p>Install the NetDefense agent on your OPNsense device with a single command:</p>
                 <div class="install-command">curl -sSL https://repo.netdefense.io/install.sh | sh</div>
+                <div class="alert alert-info">
+                    <span class="alert-icon">🔒</span>
+                    <div>
+                        <strong>Secure Installation:</strong> The installer automatically downloads the repository fingerprint and configures signature verification for all packages.
+                    </div>
+                </div>
                 <div class="alert alert-warning">
                     <span class="alert-icon">⚠</span>
                     <div>
@@ -350,27 +356,34 @@
                 <h2>Manual Installation</h2>
                 <p>If you prefer to configure the repository manually, follow these steps:</p>
 
-                <h3>1. Create Repository Configuration</h3>
-                <p>Create the NetDefense repository configuration file:</p>
+                <h3>1. Install Repository Fingerprint</h3>
+                <p>Download and install the repository signing key for package verification:</p>
+                <pre><code>mkdir -p /usr/local/etc/pkg/fingerprints/netdefense/trusted
+fetch -o /usr/local/etc/pkg/fingerprints/netdefense/trusted/netdefense \
+  https://repo.netdefense.io/opnsense/fingerprints/netdefense/trusted/netdefense</code></pre>
+
+                <h3>2. Create Repository Configuration</h3>
+                <p>Create the NetDefense repository configuration file with signature verification:</p>
                 <pre><code>mkdir -p /usr/local/etc/pkg/repos
 cat &lt;&lt; EOF &gt; /usr/local/etc/pkg/repos/netdefense.conf
 NetDefense: {
     url: "https://repo.netdefense.io/opnsense",
-    mirror_type: "https",
+    priority: 5,
     enabled: yes,
-    signature_type: "none"
+    signature_type: "fingerprints",
+    fingerprints: "/usr/local/etc/pkg/fingerprints/netdefense"
 }
 EOF</code></pre>
 
-                <h3>2. Update Package Database</h3>
+                <h3>3. Update Package Database</h3>
                 <p>Refresh the package repository database:</p>
                 <pre><code>pkg update</code></pre>
 
-                <h3>3. Install NetDefense Agent</h3>
+                <h3>4. Install NetDefense Agent</h3>
                 <p>Install the NetDefense package:</p>
                 <pre><code>pkg install os-netdefense</code></pre>
 
-                <h3>4. Verify Installation</h3>
+                <h3>5. Verify Installation</h3>
                 <p>Confirm the package is installed correctly:</p>
                 <pre><code>pkg info os-netdefense</code></pre>
             </section>
@@ -409,10 +422,17 @@ EOF</code></pre>
 
             <section>
                 <h2>Important Notes</h2>
+                <div class="alert alert-info">
+                    <span class="alert-icon">🔒</span>
+                    <div>
+                        <strong>Package Signing:</strong> All packages in this repository are cryptographically signed using SHA-256 fingerprints. The installation process automatically verifies package signatures to ensure authenticity and integrity.
+                    </div>
+                </div>
+
                 <div class="alert alert-warning">
                     <span class="alert-icon">⚠</span>
                     <div>
-                        <strong>Security Warning:</strong> Adding third-party package repositories to your firewall requires careful consideration. Only add repositories from trusted sources. The NetDefense repository currently uses unsigned packages for development purposes. Production deployments should implement proper package signing.
+                        <strong>Security Notice:</strong> Adding third-party package repositories to your firewall requires careful consideration. Only add repositories from trusted sources. Always verify the repository fingerprint matches the official NetDefense fingerprint.
                     </div>
                 </div>
 
@@ -437,6 +457,13 @@ EOF</code></pre>
                 <p>To disable the repository without uninstalling the package:</p>
                 <pre><code>rm /usr/local/etc/pkg/repos/netdefense.conf
 pkg update</code></pre>
+
+                <h3>Verifying Repository Fingerprint</h3>
+                <p>For security, you can verify the repository signing fingerprint:</p>
+                <pre><code>cat /usr/local/etc/pkg/fingerprints/netdefense/trusted/netdefense</code></pre>
+                <p>The fingerprint should show:</p>
+                <pre><code>function: sha256
+fingerprint: "97deed32012431768be5ccd10b34e145450e97890593c7b522eafe4fe9fdb99d"</code></pre>
             </section>
 
             <section id="support">
