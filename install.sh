@@ -1,10 +1,47 @@
 #!/bin/sh
 #
 # NetDefense Agent Installer for OPNsense
-# Usage: curl -sSL https://repo.netdefense.io/install.sh | sh
+#
+# Usage:
+#   Default (prod channel):
+#     curl -sSL https://repo.netdefense.io/install.sh | sh
+#   Other channels (operator-only):
+#     curl -sSL https://repo.netdefense.io/install.sh | sh -s -- --env=qa
+#     curl -sSL https://repo.netdefense.io/install.sh | sh -s -- --env=dev
 #
 
 set -e
+
+# Parse --env=prod|qa|dev (default: prod)
+TARGET_ENV="prod"
+for arg in "$@"; do
+    case "$arg" in
+        --env=*)
+            TARGET_ENV="${arg#--env=}"
+            ;;
+        *)
+            echo "Unknown argument: $arg" >&2
+            echo "Usage: $0 [--env=prod|qa|dev]" >&2
+            exit 1
+            ;;
+    esac
+done
+
+case "$TARGET_ENV" in
+    prod)
+        PACKAGE_NAME="os-netdefense"
+        ;;
+    qa)
+        PACKAGE_NAME="os-netdefense-qa"
+        ;;
+    dev)
+        PACKAGE_NAME="os-netdefense-dev"
+        ;;
+    *)
+        echo "Invalid --env=${TARGET_ENV} (must be prod, qa, or dev)" >&2
+        exit 1
+        ;;
+esac
 
 # Colors for output (if terminal supports it)
 if [ -t 1 ]; then
@@ -21,14 +58,15 @@ else
     NC=''
 fi
 
-# Configuration
+# Configuration. URLs route to the per-env channel under the same domain;
+# fingerprints live alongside each channel's pkg metadata so the same
+# signing key serves all three (only the metadata index differs per env).
 REPO_NAME="netdefense"
 REPO_CONF_DIR="/usr/local/etc/pkg/repos"
 REPO_CONF_FILE="${REPO_CONF_DIR}/${REPO_NAME}.conf"
-REPO_URL="https://repo.netdefense.io/opnsense"
-PACKAGE_NAME="os-netdefense"
+REPO_URL="https://repo.netdefense.io/${TARGET_ENV}/opnsense"
 FINGERPRINT_DIR="/usr/local/etc/pkg/fingerprints/${REPO_NAME}/trusted"
-FINGERPRINT_URL="https://repo.netdefense.io/opnsense/fingerprints/netdefense/trusted/netdefense"
+FINGERPRINT_URL="${REPO_URL}/fingerprints/netdefense/trusted/netdefense"
 
 # Logging functions
 log_info() {
@@ -194,6 +232,9 @@ EOF
 main() {
     echo ""
     log_info "Starting NetDefense Agent installation..."
+    log_info "Channel: ${TARGET_ENV}"
+    log_info "Package: ${PACKAGE_NAME}"
+    log_info "Repo:    ${REPO_URL}"
     echo ""
 
     check_os
