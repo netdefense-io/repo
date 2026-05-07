@@ -61,11 +61,19 @@ fi
 # Configuration. URLs route to the per-env channel under the same domain;
 # fingerprints live alongside each channel's pkg metadata so the same
 # signing key serves all three (only the metadata index differs per env).
-REPO_NAME="netdefense"
+#
+# REPO_NAME is the dictionary key written into the .conf file and is what
+# OPNsense renders in System → Firmware → Plugins as the originating repo
+# (mirrors how OPNsense itself shows up as "OPNsense"). Server-side
+# fingerprint paths stay lowercase; only the client-side label changes.
+REPO_NAME="NetDefense"
+LEGACY_REPO_NAME="netdefense"
 REPO_CONF_DIR="/usr/local/etc/pkg/repos"
 REPO_CONF_FILE="${REPO_CONF_DIR}/${REPO_NAME}.conf"
+LEGACY_REPO_CONF_FILE="${REPO_CONF_DIR}/${LEGACY_REPO_NAME}.conf"
 REPO_URL="https://repo.netdefense.io/${TARGET_ENV}/opnsense"
 FINGERPRINT_DIR="/usr/local/etc/pkg/fingerprints/${REPO_NAME}/trusted"
+LEGACY_FINGERPRINT_DIR="/usr/local/etc/pkg/fingerprints/${LEGACY_REPO_NAME}"
 FINGERPRINT_URL="${REPO_URL}/fingerprints/netdefense/trusted/netdefense"
 
 # Logging functions
@@ -137,6 +145,21 @@ install_fingerprint() {
         log_success "Fingerprint installed successfully"
     else
         error_exit "Failed to download repository fingerprint" 3
+    fi
+}
+
+# Remove the legacy lowercase repo registration so we don't end up with
+# two parallel repos pointing at the same packages. Older installs of
+# this script registered the repo as "netdefense"; the dictionary key is
+# what OPNsense displays, so we switched to "NetDefense".
+remove_legacy_repo() {
+    if [ -f "${LEGACY_REPO_CONF_FILE}" ]; then
+        log_info "Removing legacy lowercase repo: ${LEGACY_REPO_CONF_FILE}"
+        rm -f "${LEGACY_REPO_CONF_FILE}" || log_warning "Failed to remove ${LEGACY_REPO_CONF_FILE}"
+    fi
+    if [ -d "${LEGACY_FINGERPRINT_DIR}" ]; then
+        log_info "Removing legacy fingerprint dir: ${LEGACY_FINGERPRINT_DIR}"
+        rm -rf "${LEGACY_FINGERPRINT_DIR}" || log_warning "Failed to remove ${LEGACY_FINGERPRINT_DIR}"
     fi
 }
 
@@ -240,6 +263,7 @@ main() {
     check_os
     check_root
     create_repo_dir
+    remove_legacy_repo
     install_fingerprint
     configure_repo
     update_pkg_repo
