@@ -9,23 +9,53 @@
 #     curl -sSL https://repo.netdefense.io/install.sh | sh -s -- --env=qa
 #     curl -sSL https://repo.netdefense.io/install.sh | sh -s -- --env=dev
 #
+#   Unattended install (registration token + API auto-setup + enable):
+#     curl -sSL https://repo.netdefense.io/install.sh | \
+#       sh -s -- --auto-setup=<org-registration-token-uuid>
+#
+#   Add --non-interactive for CI/IaC consumers — replaces the trailing
+#   prose summary with a parseable KEY=value status block.
+#
 
 set -e
 
-# Parse --env=prod|qa|dev (default: prod)
+# Parse args
 TARGET_ENV="prod"
+AUTO_SETUP_TOKEN=""
+NON_INTERACTIVE=0
 for arg in "$@"; do
     case "$arg" in
         --env=*)
             TARGET_ENV="${arg#--env=}"
             ;;
+        --auto-setup=*)
+            AUTO_SETUP_TOKEN="${arg#--auto-setup=}"
+            ;;
+        --non-interactive)
+            NON_INTERACTIVE=1
+            ;;
         *)
             echo "Unknown argument: $arg" >&2
-            echo "Usage: $0 [--env=prod|qa|dev]" >&2
+            echo "Usage: $0 [--env=prod|qa|dev] [--auto-setup=<uuid>] [--non-interactive]" >&2
             exit 1
             ;;
     esac
 done
+
+# Validate --auto-setup token format up-front so we fail before any side
+# effects on the system. The OPNsense Settings model enforces the same
+# regex (Settings.xml: token mask) — pre-validating here gives a clear
+# error from the shell instead of a vague PHP rejection later.
+if [ -n "${AUTO_SETUP_TOKEN}" ]; then
+    case "${AUTO_SETUP_TOKEN}" in
+        [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]-[0-9a-f][0-9a-f][0-9a-f][0-9a-f]-[0-9a-f][0-9a-f][0-9a-f][0-9a-f]-[0-9a-f][0-9a-f][0-9a-f][0-9a-f]-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f])
+            ;;
+        *)
+            echo "Invalid --auto-setup value: must be a lowercase UUID (8-4-4-4-12 hex)" >&2
+            exit 10
+            ;;
+    esac
+fi
 
 case "$TARGET_ENV" in
     prod)
@@ -236,6 +266,63 @@ verify_installation() {
     fi
 }
 
+# Apply unattended settings via the plugin's CLI helper. Runs only when
+# --auto-setup=<token> was passed. Generates a fresh device UUID locally,
+# then asks configure.php to persist token + deviceId, provision the
+# OPNsense API user/key, and enable the agent — all in one Config save.
+#
+# Sets the following globals so post_install_info_unattended can render
+# the summary:
+#   APPLIED_DEVICE_UUID, APPLIED_API_KEY, APPLIED_RESULT
+apply_unattended_settings() {
+    log_info "Applying unattended configuration..."
+
+    CONFIGURE_PHP="/usr/local/opnsense/scripts/OPNsense/NetDefense/configure.php"
+    if [ ! -x "${CONFIGURE_PHP}" ]; then
+        log_error "Plugin helper not found at ${CONFIGURE_PHP}"
+        log_error "The package may be too old (pre-1.5.0) or corrupted."
+        exit 20
+    fi
+
+    APPLIED_DEVICE_UUID="$(uuidgen | tr '[:upper:]' '[:lower:]')"
+    log_info "Generated device UUID: ${APPLIED_DEVICE_UUID}"
+    log_info "Provisioning OPNsense API user + key..."
+
+    # Capture stdout (JSON) and exit code separately. configure.php emits
+    # one line of JSON with --json; we parse the api_key field for the
+    # status block. stderr passes through to the operator.
+    HELPER_OUT="$(${CONFIGURE_PHP} \
+        --token="${AUTO_SETUP_TOKEN}" \
+        --device-id="${APPLIED_DEVICE_UUID}" \
+        --setup-api \
+        --enable \
+        --json)" || HELPER_RC=$?
+    HELPER_RC="${HELPER_RC:-0}"
+
+    # Extract api_key from JSON (simple awk extraction; no jq on stock OPNsense).
+    APPLIED_API_KEY="$(printf '%s' "${HELPER_OUT}" \
+        | awk -F'"api_key":"' 'NF>1{sub(/".*/,"",$2);print $2}')"
+    APPLIED_RESULT="$(printf '%s' "${HELPER_OUT}" \
+        | awk -F'"result":"' 'NF>1{sub(/".*/,"",$2);print $2}')"
+
+    case "${HELPER_RC}" in
+        0)
+            log_success "Unattended configuration applied"
+            ;;
+        21)
+            log_warning "Token saved, but API auto-setup failed."
+            log_warning "Finish API setup from Services > NetDefense > Setup API Credentials."
+            log_info "Helper output: ${HELPER_OUT}"
+            # Don't `exit` — the agent is otherwise viable for non-API tasks.
+            ;;
+        *)
+            log_error "Unattended configuration failed (exit ${HELPER_RC})"
+            log_error "Helper output: ${HELPER_OUT}"
+            exit "${HELPER_RC}"
+            ;;
+    esac
+}
+
 # Display post-installation information
 post_install_info() {
     cat <<'EOF'
@@ -248,6 +335,36 @@ Configuration:
   Navigate to Services > NetDefense in the OPNsense web interface
   to configure and manage the NetDefense agent.
 
+EOF
+}
+
+# Post-install summary for the unattended path. Format mirrors a key=value
+# block that CI consumers can grep; the prose echo is suppressed under
+# --non-interactive.
+post_install_info_unattended() {
+    if [ "${NON_INTERACTIVE}" -eq 1 ]; then
+        cat <<EOF
+STATUS=${APPLIED_RESULT:-unknown}
+DEVICE_UUID=${APPLIED_DEVICE_UUID}
+API_KEY=${APPLIED_API_KEY}
+ENV=${TARGET_ENV}
+EOF
+        return
+    fi
+
+    cat <<EOF
+
+========================================
+NetDefense Agent Installation Complete
+========================================
+
+Registration token: APPLIED
+Device UUID:        ${APPLIED_DEVICE_UUID}
+API credentials:    ${APPLIED_API_KEY:+APPLIED}
+Service enabled:    YES (${TARGET_ENV} channel)
+
+Next step:
+  Approve this device in NetDefense (it will appear pending).
 EOF
 }
 
@@ -271,7 +388,12 @@ main() {
     verify_installation
 
     echo ""
-    post_install_info
+    if [ -n "${AUTO_SETUP_TOKEN}" ]; then
+        apply_unattended_settings
+        post_install_info_unattended
+    else
+        post_install_info
+    fi
 
     exit 0
 }
