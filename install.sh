@@ -273,7 +273,13 @@ verify_installation() {
 #
 # Sets the following globals so post_install_info_unattended can render
 # the summary:
-#   APPLIED_DEVICE_UUID, APPLIED_API_KEY, APPLIED_RESULT
+#   APPLIED_DEVICE_UUID, APPLIED_RESULT, APPLIED_API_SETUP
+#
+# The OPNsense API key + secret are deliberately not surfaced here. They
+# live only in /conf/config.xml and the rendered ndagent.conf — both
+# root-readable on the box. install.sh stdout flows into operator
+# terminals, CI logs, and screenshots; the credential must not appear on
+# any of those surfaces.
 apply_unattended_settings() {
     log_info "Applying unattended configuration..."
 
@@ -288,9 +294,9 @@ apply_unattended_settings() {
     log_info "Generated device UUID: ${APPLIED_DEVICE_UUID}"
     log_info "Provisioning OPNsense API user + key..."
 
-    # Capture stdout (JSON) and exit code separately. configure.php emits
-    # one line of JSON with --json; we parse the api_key field for the
-    # status block. stderr passes through to the operator.
+    # Capture stdout (JSON) and exit code separately. configure.php's
+    # --json output omits the api_key/api_secret by design, so HELPER_OUT
+    # is safe to log. stderr passes through to the operator.
     HELPER_OUT="$(${CONFIGURE_PHP} \
         --token="${AUTO_SETUP_TOKEN}" \
         --device-id="${APPLIED_DEVICE_UUID}" \
@@ -299,11 +305,10 @@ apply_unattended_settings() {
         --json)" || HELPER_RC=$?
     HELPER_RC="${HELPER_RC:-0}"
 
-    # Extract api_key from JSON (simple awk extraction; no jq on stock OPNsense).
-    APPLIED_API_KEY="$(printf '%s' "${HELPER_OUT}" \
-        | awk -F'"api_key":"' 'NF>1{sub(/".*/,"",$2);print $2}')"
     APPLIED_RESULT="$(printf '%s' "${HELPER_OUT}" \
         | awk -F'"result":"' 'NF>1{sub(/".*/,"",$2);print $2}')"
+    APPLIED_API_SETUP="$(printf '%s' "${HELPER_OUT}" \
+        | awk -F'"api_setup":"' 'NF>1{sub(/".*/,"",$2);print $2}')"
 
     case "${HELPER_RC}" in
         0)
@@ -342,11 +347,20 @@ EOF
 # block that CI consumers can grep; the prose echo is suppressed under
 # --non-interactive.
 post_install_info_unattended() {
+    # APPLIED_API_SETUP values: "ok" (provisioned just now), "skipped"
+    # (already configured), "failed" (recoverable; operator finishes via
+    # web UI). Never echo the key itself.
+    case "${APPLIED_API_SETUP}" in
+        ok|skipped) API_STATUS="APPLIED" ;;
+        failed)     API_STATUS="FAILED — finish via web UI" ;;
+        *)          API_STATUS="not configured" ;;
+    esac
+
     if [ "${NON_INTERACTIVE}" -eq 1 ]; then
         cat <<EOF
 STATUS=${APPLIED_RESULT:-unknown}
 DEVICE_UUID=${APPLIED_DEVICE_UUID}
-API_KEY=${APPLIED_API_KEY}
+API_SETUP=${APPLIED_API_SETUP:-unknown}
 ENV=${TARGET_ENV}
 EOF
         return
@@ -360,7 +374,7 @@ NetDefense Agent Installation Complete
 
 Registration token: APPLIED
 Device UUID:        ${APPLIED_DEVICE_UUID}
-API credentials:    ${APPLIED_API_KEY:+APPLIED}
+API credentials:    ${API_STATUS}
 Service enabled:    YES (${TARGET_ENV} channel)
 
 Next step:
