@@ -101,10 +101,26 @@ LEGACY_REPO_NAME="netdefense"
 REPO_CONF_DIR="/usr/local/etc/pkg/repos"
 REPO_CONF_FILE="${REPO_CONF_DIR}/${REPO_NAME}.conf"
 LEGACY_REPO_CONF_FILE="${REPO_CONF_DIR}/${LEGACY_REPO_NAME}.conf"
-REPO_URL="https://repo.netdefense.io/${TARGET_ENV}/opnsense"
+
+# Channel root (no ABI segment). Dual-ABI layout: each channel serves both
+# FreeBSD ABIs (FreeBSD:14:amd64 / FreeBSD:15:amd64 — OPNsense 26.7+ moved
+# to FreeBSD 15) as independent, self-contained pkg(8) repo mirrors under
+# ${channel}/opnsense/${ABI}/, mirroring how OPNsense's own repo and
+# pkg.freebsd.org lay out ${ABI}-nested mirrors.
+CHANNEL_ROOT="https://repo.netdefense.io/${TARGET_ENV}/opnsense"
+
+# Repo conf URL written into NetDefense.conf's url: field. The `${ABI}`
+# here is pkg(8)'s own substitution variable, NOT a shell variable — it
+# must land in the file UNEXPANDED (escaped below) so pkg resolves it at
+# every `pkg update`/`pkg install` from the installing box's own live ABI.
+# This is deliberately different from FINGERPRINT_URL below: that fetch is
+# performed by THIS script via `fetch`, which has no notion of pkg's
+# ${ABI} substitution, so it needs a concretely resolved ABI instead (see
+# install_fingerprint(), which resolves it via `pkg config ABI`).
+REPO_URL="${CHANNEL_ROOT}/\${ABI}"
+
 FINGERPRINT_DIR="/usr/local/etc/pkg/fingerprints/${REPO_NAME}/trusted"
 LEGACY_FINGERPRINT_DIR="/usr/local/etc/pkg/fingerprints/${LEGACY_REPO_NAME}"
-FINGERPRINT_URL="${REPO_URL}/fingerprints/netdefense/trusted/netdefense"
 
 # Logging functions
 log_info() {
@@ -168,6 +184,19 @@ install_fingerprint() {
         log_info "Creating ${FINGERPRINT_DIR}..."
         mkdir -p "${FINGERPRINT_DIR}" || error_exit "Failed to create fingerprint directory" 2
     fi
+
+    # Resolve this box's concrete pkg ABI. Each ABI has its own
+    # self-contained repo mirror (own fingerprints/ dir too), and unlike
+    # NetDefense.conf's url: (pkg-substituted, see REPO_URL above), this
+    # script downloads the fingerprint itself via `fetch`, which cannot
+    # expand pkg's ${ABI} variable — it needs a real, resolved URL.
+    LOCAL_PKG_ABI="$(pkg config ABI 2>/dev/null)"
+    if [ -z "${LOCAL_PKG_ABI}" ]; then
+        error_exit "Could not determine local pkg ABI ('pkg config ABI' returned empty). Is pkg bootstrapped?" 2
+    fi
+    log_info "Detected local pkg ABI: ${LOCAL_PKG_ABI}"
+
+    FINGERPRINT_URL="${CHANNEL_ROOT}/${LOCAL_PKG_ABI}/fingerprints/netdefense/trusted/netdefense"
 
     # Download fingerprint
     log_info "Downloading fingerprint from ${FINGERPRINT_URL}..."
@@ -388,7 +417,7 @@ main() {
     log_info "Starting NetDefense Agent installation..."
     log_info "Channel: ${TARGET_ENV}"
     log_info "Package: ${PACKAGE_NAME}"
-    log_info "Repo:    ${REPO_URL}"
+    log_info "Repo:    ${CHANNEL_ROOT}/<your ABI> (pkg resolves \${ABI} from this box's own FreeBSD ABI)"
     echo ""
 
     check_os
